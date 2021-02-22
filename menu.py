@@ -1,6 +1,7 @@
 import tkinter as tk
 from clock import AnalogClock
 from tkinter import ttk
+from threading import Thread
 import time
 
 
@@ -22,43 +23,60 @@ class menu(tk.Frame):
         self.root = tk.Tk()
         self.root.geometry("300x300")
         self.clock_list = []
+        self.task_list = []
 
     def add_clock(self, *args):
         idxs = self.box.curselection()
         self.text1.set("Do you want to add \n" +
                        self.choices[idxs[0]]+" clock?")
 
-    def create_clock(self, timedif=0):
+    def create_clock(self):
         idxs = self.box.curselection()
         if self.choices[idxs[0]] == "Thailand":
-            self.loadingscreen()
-            self.clock_list.append(AnalogClock(
-                self.root, 0, len(self.clock_list), 0))
+            self.run_loading(0)
         elif self.choices[idxs[0]] == "US":
-            self.loadingscreen()
-            self.clock_list.append(AnalogClock(
-                self.root, 0, len(self.clock_list), -12))
+            self.run_loading(-12)
         elif self.choices[idxs[0]] == "UK":
-            self.loadingscreen()
-            self.clock_list.append(AnalogClock(
-                self.root, 0, len(self.clock_list), -7))
+            self.run_loading(-7)
         elif self.choices[idxs[0]] == "Japan":
-            self.loadingscreen()
-            self.clock_list.append(AnalogClock(
-                self.root, 0, len(self.clock_list), 2))
+            self.run_loading(2)
 
-    def loadingscreen(self):
-        self.percent = tk.IntVar()
-        self.loading_frame = tk.Frame(self.root)
-        self.loading_frame.grid(row=0, column=0, sticky="NEWS")
-        self.p = ttk.Progressbar(
-            self.loading_frame, length=200, mode='determinate', variable=self.percent)
-        self.p.grid(row=1, column=0)
-        self.root.update()
-        for i in range(51):
+    def run_loading(self, timediff):
+        self.thread_loading_screen(timediff)
+
+    def thread_loading_screen(self, timediff):
+
+        # self.loading_task = Thread(target=self.task1)
+        # self.loading_task.start()
+        thread = Thread(target=self.task1(timediff))
+        thread.start()
+
+        # self.after(10, self.check_loading)
+
+    # def check_loading(self):
+    #     if self.loading_task.is_alive():
+    #         print('Not Done')
+    #         self.after(10, self.check_loading)
+    #     else:
+    #         print("Done")
+    #         self.loading_frame.destroy()
+
+    def task1(self, timediff):
+        self.task_list.append(0)
+        loading_frame = tk.Frame(self.root)
+        print(self.task_list)
+        loading_frame.grid(row=0, column=len(self.task_list))
+        p = ttk.Progressbar(
+            loading_frame, length=200, mode="determinate")
+        p.grid(row=4, column=0)
+        for i in range(101):
             time.sleep(0.1)
-            self.percent.set(i)
-            self.root.update()
+            p['value'] = i
+            self.update()
+        p.destroy()
+        self.clock_list.append(AnalogClock(
+            loading_frame, 0, len(self.task_list), timediff))
+        print("Loading new Clock")
 
 
 if __name__ == "__main__":
