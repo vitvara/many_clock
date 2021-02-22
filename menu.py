@@ -20,6 +20,7 @@ class menu(tk.Frame):
                                 command=self.create_clock)
         self.button.grid(row=1, column=1)
         self.root = tk.Tk()
+        self.root.geometry("300x300")
         self.clock_list = []
 
     def add_clock(self, *args):
@@ -48,14 +49,16 @@ class menu(tk.Frame):
 
     def loadingscreen(self):
         self.percent = tk.IntVar()
-        self.p = ttk.Progressbar(self.root,
-                                 length=200, mode='determinate', variable=self.percent)
-        self.p.grid()
-        self.update
-        for i in range(101):
+        self.loading_frame = tk.Frame(self.root)
+        self.loading_frame.grid(row=0, column=0, sticky="NEWS")
+        self.p = ttk.Progressbar(
+            self.loading_frame, length=200, mode='determinate', variable=self.percent)
+        self.p.grid(row=1, column=0)
+        self.root.update()
+        for i in range(51):
             time.sleep(0.1)
             self.percent.set(i)
-            self.update()
+            self.root.update()
 
 
 if __name__ == "__main__":
